@@ -17,9 +17,9 @@ def get_project_hotlink_report(files: str) -> list:
         hotlinks = html.get_image_hotlinks(file_soup)
         if hotlinks:
             result = f"fail: {filename} has {len(hotlinks)} hotlinked images"
-            results.append((expected, result))
         else:
             result = expected
+        results.append((expected, results))
     return results
 
 
