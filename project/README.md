@@ -29,8 +29,8 @@ Students will code and design an image gallery project that contains a minimum o
     - Unless you took the image yourself, the caption should also link to the source of the image.
 
 ### Validity Requirements
-* No HTML errors (this will be tested in the html tests)
-* No CSS errors (this will be tested in the css tests)
+* No HTML errors (this will be tested in the validator tests)
+* No CSS errors (this will be tested in the validator tests)
 
 ### CSS Requirements
 * A font pairing.

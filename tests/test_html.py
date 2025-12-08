@@ -4,10 +4,28 @@ Test for HTML requirements
 import pytest
 import file_clerk.clerk as clerk
 from webcode_tk import html_tools as html
-from webcode_tk import validator_tools as validator
+
+
+def get_project_hotlink_report(files: str) -> list:
+    """returns a list of any hotlinked image src values
+    """
+    results = []
+    for file in files:
+        filename = clerk.get_file_name(file)
+        expected = f"pass: {filename} has no hotlinks!"
+        file_soup = html.get_html(file)
+        hotlinks = html.get_image_hotlinks(file_soup)
+        if hotlinks:
+            result = f"fail: {filename} has {len(hotlinks)} hotlinked images"
+            results.append((expected, result))
+        else:
+            result = expected
+    return results
+
 
 project_dir = "project/"
 all_html_files = html.get_all_html_files(project_dir)
+
 
 # List of required elements (per web page)
 required_elements = [("doctype", 1),
@@ -31,8 +49,8 @@ exact_number_of_elements = html.get_number_of_elements_per_file(
 min_number_of_elements = html.get_number_of_elements_per_file(
     project_dir, min_required_elements
 )
-html_validation_results = validator.get_project_validation(project_dir)
 
+hotlink_report = get_project_hotlink_report(all_html_files)
 
 @pytest.fixture
 def html_files():
@@ -67,17 +85,6 @@ def test_files_for_minimum_number_of_elements(file, element, num):
     assert actual >= num
 
 
-def test_passes_html_validation(html_files):
-    errors = []
-    if not html_files:
-        assert "html files" in html_files
-    for file in html_files:
-        results = validator.get_markup_validity(file)
-        for result in results:
-            errors.append(result.get("message"))
-    assert not errors
-
-
 def test_number_of_image_files_for_proficient():
     image_files = []
     image_files += clerk.get_all_files_of_type(project_dir, "jpg")
@@ -85,3 +92,8 @@ def test_number_of_image_files_for_proficient():
     image_files += clerk.get_all_files_of_type(project_dir, "gif")
     image_files += clerk.get_all_files_of_type(project_dir, "webp")
     assert len(image_files) >= 18
+
+
+@pytest.mark.parametrize("expected, result", hotlink_report)
+def test_for_no_hotlinks(expected, result):
+    assert expected == result
